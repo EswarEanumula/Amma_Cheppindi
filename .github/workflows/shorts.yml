@@ -1,0 +1,35 @@
+name: Telugu Shorts
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Output mode
+        type: choice
+        options: [render, private, public]
+        default: render
+  schedule:
+    - cron: '17 13 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: amma-cheppindi-production
+  cancel-in-progress: false
+jobs:
+  produce:
+    if: github.event_name == 'workflow_dispatch' || vars.AMMA_DAILY_MODE == 'public' || vars.AMMA_DAILY_MODE == 'private'
+    runs-on: [self-hosted, macOS, ARM64, amma-cheppindi]
+    timeout-minutes: 30
+    env:
+      AMMA_MODE: ${{ inputs.mode || vars.AMMA_DAILY_MODE }}
+      NODES_EXCLUDE: '["n8n-nodes-base.localFileTrigger"]'
+      N8N_DIAGNOSTICS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import and execute n8n workflow
+        shell: bash
+        run: |
+          export PATH="$HOME/.amma-cheppindi/venv/bin:/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:$PATH"
+          export N8N_USER_FOLDER="$(mktemp -d "$RUNNER_TEMP/amma-n8n.XXXXXX")"
+          trap 'rm -rf "$N8N_USER_FOLDER"' EXIT
+          n8n import:workflow --input=n8n/shorts.json
+          n8n execute --id=AmmaCheppindi001
