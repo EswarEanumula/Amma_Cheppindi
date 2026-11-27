@@ -1,0 +1,47 @@
+{
+  "name": "Amma Cheppindi Shorts",
+  "id": "AmmaCheppindi001",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f201c0ed-1d59-456c-911e-b55788006042",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python3 -u \"$GITHUB_WORKSPACE/produce.py\" \"$AMMA_MODE\""
+      },
+      "id": "49b267d0-c2f0-424d-9b33-31a30ea49069",
+      "name": "Render and upload",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Render and upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
